@@ -5,19 +5,17 @@ import com.github.kevinm.lb3tomml.spc.Aram;
 public class SongChannel {
     
     // Constants
-    private final Aram aram;
-    private final int id;
-    private final int startAddress;
+    final Aram aram;
+    final int id;
+    final int startAddress;
     
     // Runtime variables
-    private int pc;
-    private int currentLength;
-    private int returnAddress1;
-    private int returnAddress2;
-    private int superloopAddress1;
-    private int superloopAddress2;
-    private int superloopCounter1;
-    private int superloopCounter2;
+    int pc = 0;
+    int currentLength = 0;
+    int[] returnAddress = {0, 0};
+    int[] superloopStartAddress = {0, 0};
+    int[] superloopEndAddress = {0, 0};
+    int[] superloopCounter = {0, 0};
     
     // private List<>
     
@@ -25,23 +23,51 @@ public class SongChannel {
         this.aram = aram;
         this.id = id;
         this.startAddress = startAddress;
-        this.pc = startAddress;
     }
     
-    private void disassemble() {
+    public void disassemble() {
+        pc = startAddress;
         boolean end = false;
         
         while (!end) { // NOSONAR
             // Read the current hex command.
             int cmd = aram.getUnsignedByte(pc++);
-            decode(cmd);
+            System.out.println(String.format("Processing command 0x%02x on channel %d", cmd, id));
+            HexCommand hexCommand = HexCommand.of(cmd);
+            hexCommand.process(this);
         }
     }
     
-    private void decode(int cmd) {
-        if (cmd < 0x60) {
-            
-        }
+    public int getNextSignedByte() {
+        return aram.getSignedByte(pc++);
+    }
+    
+    public int getNextSignedWord() {
+        int next = aram.getSignedWord(pc);
+        pc += 2;
+        return next;
+    }
+    
+    public int getNextSignedLong() {
+        int next = aram.getSignedLong(pc);
+        pc += 3;
+        return next;
+    }
+    
+    public int getNextUnsignedByte() {
+        return aram.getUnsignedByte(pc++);
+    }
+    
+    public int getNextUnsignedWord() {
+        int next = aram.getUnsignedWord(pc);
+        pc += 2;
+        return next;
+    }
+    
+    public int getNextUnsignedLong() {
+        int next = aram.getUnsignedLong(pc);
+        pc += 3;
+        return next;
     }
     
 }

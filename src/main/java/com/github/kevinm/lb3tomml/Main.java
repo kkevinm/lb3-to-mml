@@ -35,6 +35,8 @@ public final class Main {
             System.out.println("Error: " + e.getLocalizedMessage());
             return;
         }
+        
+        disassembler.disassemble();
     }
     
     public static String removeExtension(String filename) {

@@ -1,17 +1,17 @@
 package com.github.kevinm.lb3tomml.lb3;
 
-public class Note extends HexCommand {
+public class NoteCommand extends HexCommand {
     
     private static final int STARTING_OCTAVE = 1;
     private static final String[] NOTES = {
             "c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
     };
     
-    public Note(int value) {
+    public NoteCommand(int value) {
         super(value);
         
         if (value < 0 || value > 0x5f) {
-            throw new IllegalArgumentException(String.format("Invalid note value: 0x%2X", value));
+            throw new IllegalArgumentException(String.format("Invalid note command: 0x%02x", value));
         }
     }
     
@@ -41,6 +41,12 @@ public class Note extends HexCommand {
     
     public boolean isNoise() {
         return value > 0x3f;
+    }
+
+    @Override
+    public void process(SongChannel channel) {
+        // TODO Auto-generated method stub
+        
     }
     
 }
