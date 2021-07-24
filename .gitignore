@@ -30,4 +30,5 @@ target/
 *~
 .metadata
 .DS_Store
+*.spc
 
