@@ -39,8 +39,8 @@ public class Lb3Disassembler {
     public void disassemble() {
         // Create all the channels.
         for (int i = 0; i < CHANNEL_NUM; i++) {
-            int channelId = aram.getUnsignedByte(3 * i);
-            int channelAddress = aram.getUnsignedWord(3 * i + 1);
+            int channelId = aram.getUnsignedByte(SONG_DATA_ADDRESS + 3*i);
+            int channelAddress = aram.getUnsignedWord(SONG_DATA_ADDRESS + 3*i + 1);
             channels[i] = new SongChannel(aram, channelId, channelAddress);
         }
     }
