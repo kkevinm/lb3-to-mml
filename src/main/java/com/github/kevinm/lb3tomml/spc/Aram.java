@@ -38,4 +38,26 @@ public class Aram {
         return ((ram[address] & 0xff) + ((ram[address+1] << 8) & 0xffff) + (ram[address+2] << 16)) & 0xffffff;
     }
     
+    public int[] getSignedBytes(int address, int length) {
+        if (length <= 0) {
+            return new int[0];
+        }
+        int[] res = new int[length];
+        for (int i = 0; i < length; i++) {
+            res[i] = getSignedByte(address+i);
+        }
+        return res;
+    }
+    
+    public int[] getUnsignedBytes(int address, int length) {
+        if (length <= 0) {
+            return new int[0];
+        }
+        int[] res = new int[length];
+        for (int i = 0; i < length; i++) {
+            res[i] = getUnsignedByte(address+i);
+        }
+        return res;
+    }
+    
 }
