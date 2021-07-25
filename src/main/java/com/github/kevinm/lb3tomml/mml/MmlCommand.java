@@ -1,6 +1,8 @@
 package com.github.kevinm.lb3tomml.mml;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.kevinm.lb3tomml.util.Util;
@@ -9,7 +11,7 @@ public class MmlCommand {
     
     private int address;
     private final String command;
-    private final String[] parameters;
+    private final List<String> parameters;
     
     public MmlCommand(String command, String... parameters) {
         this(0, command, parameters);
@@ -18,7 +20,7 @@ public class MmlCommand {
     public MmlCommand(int address, String command, String... parameters) {
         this.address = address;
         this.command = command;
-        this.parameters = Arrays.copyOf(parameters, parameters.length);
+        this.parameters = new ArrayList<>(Arrays.asList(parameters));
     }
     
     public static MmlCommand empty() {
@@ -39,6 +41,10 @@ public class MmlCommand {
                 .collect(Collectors.toList())
                 .toArray(new String[] {});
         return new MmlCommand(command, pars);
+    }
+    
+    public void addParameter(String parameter) {
+        parameters.add(parameter);
     }
     
     public boolean isEmpty() {

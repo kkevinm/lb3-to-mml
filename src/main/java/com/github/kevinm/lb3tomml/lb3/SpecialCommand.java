@@ -3,6 +3,7 @@ package com.github.kevinm.lb3tomml.lb3;
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.util.Log;
+import com.github.kevinm.lb3tomml.util.Util;
 
 public class SpecialCommand extends HexCommand {
 
@@ -117,7 +118,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xf2:
                 par1 = channel.getNextUnsignedByte();
-                newCommand = MmlCommand.dec(MmlSymbol.VOLUME, convertVolume(par1));
+                newCommand = buildVolumeCommand(par1);
                 break;
             case 0xf3:
                 par1 = channel.getNextSignedByte();
@@ -178,9 +179,20 @@ public class SpecialCommand extends HexCommand {
         Log.logIndent("Unsupported command 0x%02x", command);
     }
     
-    private int convertVolume(int volume) {
+    private static MmlCommand buildVolumeCommand(int volume) {
         int result = 0x7f - volume;
-        return result;
+        
+        if (result <= 0x4d) {
+            result = (int) Math.ceil(Math.sqrt(841.53722309 * result));
+            return MmlCommand.dec(MmlSymbol.VOLUME, result);
+        } else {
+            int amp = (int) Math.ceil(256.0 * result / 0x4d - 256.0) & 0xff;
+            MmlCommand command = MmlCommand.dec(MmlSymbol.VOLUME, 255);
+            command.addParameter(" ");
+            command.addParameter(MmlSymbol.AMPLIFY);
+            command.addParameter(Util.hexString(amp));
+            return command;
+        }
     }
     
 }

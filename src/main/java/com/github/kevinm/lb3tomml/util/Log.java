@@ -6,7 +6,8 @@ import java.io.IOException;
 public final class Log {
     
     private static final String TAB = "  ";
-    private static boolean logEnabled = true;
+    
+    private static boolean logEnabled = false;
     private static int indentation = 0;
     private static FileWriter logFile;
     
