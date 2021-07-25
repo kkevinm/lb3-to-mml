@@ -112,6 +112,9 @@ public class SongChannel {
     }
     
     public void unconditionalJump(int address) {
+        Log.log("Processing unconditional jump command");
+        Log.logIndent("Jump address: 0x%04x", address);
+        
         // We need to check if the target address was already visited.
         // If yes, it means the address is a loop point.
         for (int i = 0; i < commands.size(); i++) {
@@ -119,7 +122,8 @@ public class SongChannel {
                 MmlCommand intro = new MmlCommand(address, MmlSymbol.INTRO);
                 commands.add(i, intro);
                 end = true;
-                Log.log("Detected channel %d loop point at 0x%02x", id, address);
+                Log.logIndent("Detected channel %d loop point at 0x%02x", id, address);
+                Log.logUnindent("End of channel %d", id);
                 return;
             }
         }
@@ -135,10 +139,16 @@ public class SongChannel {
         public void subCall(int address) {
             returnAddress = SongChannel.this.pc;
             SongChannel.this.pc = address;
+            
+            Log.log("Processing call subroutine command");
+            Log.logIndent("Jump address: 0x%04x - Return address: 0x%04x", address, returnAddress);
         }
 
         public void subReturn() {
             SongChannel.this.pc = returnAddress;
+            
+            Log.log("Processing return from subroutine command");
+            Log.logIndent("Returning to address 0x%04x", returnAddress);
         }
 
     }
@@ -151,19 +161,37 @@ public class SongChannel {
 
         public void start(int counter) {
             this.counter = counter;
+            this.startAddress = SongChannel.this.pc;
+            
+            Log.log("Processing superloop start command");
+            Log.logIndent("Start address: 0x%04x - Counter: %d", startAddress, counter);
         }
 
         public void repeat() {
+            counter--;
             endAddress = SongChannel.this.pc;
-            if (--counter != 0) {
+            
+            Log.log("Processing superloop repeat command");
+            Log.indent();
+            Log.log("End address: 0x%04x - Counter: %d", endAddress, counter);
+            
+            if (counter != 0) {
                 SongChannel.this.pc = startAddress;
+                Log.log("Counter != 0: jumping back to 0x%04x", startAddress);
+            } else {
+                Log.log("Counter == 0: end of superloop");
             }
+            
+            Log.unindent();
         }
 
         public void skipLast() {
+            Log.log("Processing superloop end command");
+            
             if (counter == 1) {
                 counter = 0;
                 SongChannel.this.pc = endAddress;
+                Log.logIndent("Counter is 1: jumping to 0x%04x", endAddress);
             }
         }
 

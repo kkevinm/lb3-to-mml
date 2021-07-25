@@ -43,6 +43,12 @@ public final class Log {
         unindent();
     }
     
+    public static final void logUnindent(String format, Object... vars) {
+        unindent();
+        log(format, vars);
+        indent();
+    }
+    
     public static final void newLine() {
         log("");
     }

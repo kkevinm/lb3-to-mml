@@ -13,33 +13,39 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        // Just for quick testing
+        // For quick testing
         // TODO: remove
-        args = new String[] {"./05 Light.spc"};
+        args = new String[] {"04 Memories.spc"};
         //
         
         if (args.length < 1) {
             System.out.println("Error: not enough parameters!");
             System.out.println("Usage: java -jar lib3-to-mml.jar <spc file>");
+            System.out.println("   or: java -jar lib3-to-mml.jar *.spc");
             return;
         }
         
+        for (String arg: args) {
+            disassemble(arg);
+        }
+    }
+    
+    private static void disassemble(String file) {
         Spc spc;
         Lb3Disassembler disassembler;
         String output;
         try {
-            spc = Spc.loadSpc(args[0]);
-            output = removeExtension(args[0]) + ".txt";
+            spc = Spc.loadSpc(file);
+            output = removeExtension(file) + ".txt";
             disassembler = new Lb3Disassembler(spc);
         } catch (IOException | SpcException e) {
             System.out.println("Error: " + e.getLocalizedMessage());
             return;
         }
-        
         disassembler.disassemble();
     }
     
-    public static String removeExtension(String filename) {
+    private static String removeExtension(String filename) {
         if (filename == null) {
             return null;
         }
