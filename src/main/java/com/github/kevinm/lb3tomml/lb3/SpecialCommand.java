@@ -1,6 +1,8 @@
 package com.github.kevinm.lb3tomml.lb3;
 
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
+import com.github.kevinm.lb3tomml.mml.MmlSymbol;
+import com.github.kevinm.lb3tomml.util.Log;
 
 public class SpecialCommand extends HexCommand {
 
@@ -16,6 +18,7 @@ public class SpecialCommand extends HexCommand {
     public MmlCommand process(SongChannel channel) {
         int par1;
         int par2;
+        MmlCommand newCommand = MmlCommand.empty();
         
         switch (value) {
             case 0xc0:
@@ -25,21 +28,21 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xcf:
-                int adsr1 = 0xff;
-                int adsr2 = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                newCommand = MmlCommand.hex(MmlSymbol.ADSR, 0xff-0x80, par1);
                 break;
             case 0xd0:
-                // TODO
+                unsupported(value);
                 break;
             case 0xd1:
-                // TODO
+                unsupported(value);
                 break;
             case 0xd2:
             case 0xe0:
                 // e0 also sets the tempo in a different variable...
-                int tempo = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                // TODO: figure out conversion to N-SPC tempo
+                newCommand = MmlCommand.dec(MmlSymbol.TEMPO, par1);
                 break;
             case 0xd6:
                 par1 = channel.getNextUnsignedWord();
@@ -56,11 +59,11 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xda:
             case 0xec:
-                par1 = channel.getNextUnsignedWord();
-                // TODO
+                channel.getNextUnsignedWord();
+                unsupported(value);
                 break;
             case 0xe2:
-                // TODO
+                unsupported(value);
                 break;
             case 0xe3:
                 int bendSpeed = channel.getNextSignedByte();
@@ -81,44 +84,44 @@ public class SpecialCommand extends HexCommand {
                 channel.routineCalls[1].subReturn();
                 break;
             case 0xe8:
-                par1 = channel.getNextUnsignedByte();
-                // TODO
+                channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xe9:
-                // TODO
+                unsupported(value);
                 break;
             case 0xea:
-                // TODO
+                unsupported(value);
                 break;
             case 0xeb:
-                par1 = channel.getNextUnsignedByte();
-                // TODO
+                channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xed:
                 channel.getNextUnsignedByte();
                 break;
             case 0xee:
-                // TODO
+                unsupported(value);
                 break;
             case 0xef:
-                // TODO
+                unsupported(value);
                 break;
             case 0xf0:
-                adsr1 = channel.getNextUnsignedByte();
-                adsr2 = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                par2 = channel.getNextUnsignedByte();
+                newCommand = MmlCommand.hex(MmlSymbol.ADSR, par1-0x80, par2);
                 break;
             case 0xf1:
                 int sampleNumber = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xf2:
-                int volume = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                newCommand = MmlCommand.dec(MmlSymbol.VOLUME, convertVolume(par1));
                 break;
             case 0xf3:
-                int semitoneShift = channel.getNextSignedByte();
-                // TODO
+                par1 = channel.getNextSignedByte();
+                newCommand = MmlCommand.hex(MmlSymbol.CHANNEL_TRANSPOSE, par1);
                 break;
             case 0xf4:
                 par1 = channel.getNextUnsignedByte();
@@ -139,33 +142,45 @@ public class SpecialCommand extends HexCommand {
                 channel.unconditionalJump(par1);
                 break;
             case 0xf9:
-                int detune = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                newCommand = MmlCommand.hex(MmlSymbol.DETUNE, par1);
                 break;
             case 0xfa:
-                par1 = channel.getNextUnsignedByte();
-                // TODO
+                channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xfb:
-                par1 = channel.getNextUnsignedByte();
-                // TODO
+                channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xfc:
-                // TODO
+                unsupported(value);
                 break;
             case 0xfd:
-                // TODO
+                unsupported(value);
                 break;
             case 0xfe:
-                par1 = channel.getNextUnsignedByte();
-                // TODO
+                channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xff:
             default:
                 // All empty commands go here.
                 break;
         }
-        return MmlCommand.empty();
+        if (!newCommand.isEmpty()) {
+            Log.logIndent("Converted to: %s", newCommand);
+        }
+        return newCommand;
+    }
+    
+    private void unsupported(int command) {
+        Log.logIndent("Unsupported command 0x%02x", command);
+    }
+    
+    private int convertVolume(int volume) {
+        int result = 0x7f - volume;
+        return result;
     }
     
 }

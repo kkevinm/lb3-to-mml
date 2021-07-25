@@ -41,7 +41,7 @@ public final class MmlSymbol {
     public static final String ECHO_SET2 = "$f1";
     public static final String ECHO_VOLUME_FADE = "$f2";
     public static final String LEGATO_TOGGLE = "$f4$01";
-    public static final String SOFT_STACCATO = "$f4$02";
+    public static final String LIGHT_STACCATO = "$f4$02";
     public static final String ECHO_TOGGLE = "$f4$03";
     public static final String DISABLE_TEMPO_HIKE = "$f4$07";
     public static final String RESTORE_INSTRUMENT = "$f4$09";

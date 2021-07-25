@@ -1,6 +1,9 @@
 package com.github.kevinm.lb3tomml.mml;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import com.github.kevinm.lb3tomml.util.Util;
 
 public class MmlCommand {
     
@@ -20,6 +23,22 @@ public class MmlCommand {
     
     public static MmlCommand empty() {
         return new MmlCommand("");
+    }
+    
+    public static MmlCommand hex(String command, int... parameters) {
+        String[] pars = Arrays.stream(parameters)
+                .mapToObj(Util::hexString)
+                .collect(Collectors.toList())
+                .toArray(new String[] {});
+        return new MmlCommand(command, pars);
+    }
+    
+    public static MmlCommand dec(String command, int... parameters) {
+        String[] pars = Arrays.stream(parameters)
+                .mapToObj(Util::decString)
+                .collect(Collectors.toList())
+                .toArray(new String[] {});
+        return new MmlCommand(command, pars);
     }
     
     public boolean isEmpty() {

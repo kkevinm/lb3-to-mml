@@ -83,7 +83,7 @@ public class NoteCommand extends HexCommand {
         Log.indent();
         Log.log("Note: %s - Rest: %s - Tie: %s - Noise: %s", isNote(), isRest(), isTie(), isNoise());
         Log.log("Name: %s - Octave: %d - Length: %d", getName(), getOctave(), channel.getCurrentLength());
-        Log.log("Converted as: %s", result.toString());
+        Log.log("Converted to: %s", result.toString());
         Log.unindent();
         
         return result;

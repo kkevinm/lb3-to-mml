@@ -36,6 +36,32 @@ public class SongChannel {
         this.startAddress = startAddress;
     }
     
+    public void disassemble() {
+        pc = startAddress;
+        end = false;
+        
+        commands.add(MmlCommand.dec(MmlSymbol.CHANNEL, id));
+        commands.add(new MmlCommand("\n\n"));
+        
+        while (!end) {
+            int cmdAddr = pc;
+            int cmd = aram.getUnsignedByte(pc++);
+            
+            Log.log("Processing command 0x%02x in channel %d at address 0x%04x", cmd, id, cmdAddr);
+            Log.indent();
+            
+            HexCommand hexCommand = HexCommand.of(cmd);
+            MmlCommand mmlCommand = hexCommand.process(this);
+            if (mmlCommand == null) {
+                mmlCommand = MmlCommand.empty();
+            }
+            mmlCommand.setAddress(cmdAddr);
+            commands.add(mmlCommand);
+            
+            Log.unindent();
+        }
+    }
+    
     public int getCurrentLength() {
         return currentLength;
     }
@@ -86,29 +112,6 @@ public class SongChannel {
         int next = aram.getUnsignedLong(pc);
         pc += 3;
         return next;
-    }
-    
-    public void disassemble() {
-        pc = startAddress;
-        end = false;
-
-        while (!end) {
-            int cmdAddr = pc;
-            int cmd = aram.getUnsignedByte(pc++);
-            
-            Log.log("Processing command 0x%02x in channel %d at address 0x%04x", cmd, id, cmdAddr);
-            Log.indent();
-            
-            HexCommand hexCommand = HexCommand.of(cmd);
-            MmlCommand mmlCommand = hexCommand.process(this);
-            if (mmlCommand == null) {
-                mmlCommand = MmlCommand.empty();
-            }
-            mmlCommand.setAddress(cmdAddr);
-            commands.add(mmlCommand);
-            
-            Log.unindent();
-        }
     }
     
     public void unconditionalJump(int address) {
