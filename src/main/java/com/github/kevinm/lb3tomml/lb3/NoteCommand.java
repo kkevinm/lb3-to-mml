@@ -1,11 +1,11 @@
 package com.github.kevinm.lb3tomml.lb3;
 
+import com.github.kevinm.lb3tomml.mml.MmlCommand;
+import com.github.kevinm.lb3tomml.mml.MmlSymbol;
+
 public class NoteCommand extends HexCommand {
     
     private static final int STARTING_OCTAVE = 1;
-    private static final String[] NOTES = {
-            "c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
-    };
     
     public NoteCommand(int value) {
         super(value);
@@ -16,7 +16,7 @@ public class NoteCommand extends HexCommand {
     }
     
     public String getName() {
-        return NOTES[value % 12];
+        return MmlSymbol.NOTES[value % 12];
     }
     
     public int getOctave() {
@@ -44,9 +44,9 @@ public class NoteCommand extends HexCommand {
     }
 
     @Override
-    public void process(SongChannel channel) {
-        // TODO Auto-generated method stub
-        
+    public MmlCommand process(SongChannel channel) {
+        // TODO
+        return MmlCommand.empty();
     }
     
 }

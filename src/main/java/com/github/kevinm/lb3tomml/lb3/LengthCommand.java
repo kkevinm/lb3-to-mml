@@ -1,5 +1,7 @@
 package com.github.kevinm.lb3tomml.lb3;
 
+import com.github.kevinm.lb3tomml.mml.MmlCommand;
+
 public class LengthCommand extends HexCommand {
 
     protected LengthCommand(int value) {
@@ -15,9 +17,9 @@ public class LengthCommand extends HexCommand {
     }
 
     @Override
-    public void process(SongChannel channel) {
-        // TODO Auto-generated method stub
-        
+    public MmlCommand process(SongChannel channel) {
+        channel.currentLength = value;
+        return MmlCommand.empty();
     }
     
 }

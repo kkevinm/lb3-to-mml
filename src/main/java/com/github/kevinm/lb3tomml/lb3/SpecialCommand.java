@@ -1,5 +1,7 @@
 package com.github.kevinm.lb3tomml.lb3;
 
+import com.github.kevinm.lb3tomml.mml.MmlCommand;
+
 public class SpecialCommand extends HexCommand {
 
     protected SpecialCommand(int value) {
@@ -11,7 +13,7 @@ public class SpecialCommand extends HexCommand {
     }
 
     @Override
-    public void process(SongChannel channel) {
+    public MmlCommand process(SongChannel channel) {
         switch (value) {
             case 0xc0:
                 // TODO
@@ -38,23 +40,16 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xd6:
                 int jumpAddress = channel.getNextUnsignedWord();
-                channel.returnAddress[0] = channel.pc;
-                channel.pc = jumpAddress;
+                channel.routineCalls[0].subCall(jumpAddress);
                 break;
             case 0xd7:
-                channel.pc = channel.returnAddress[0];
+                channel.routineCalls[0].subReturn();
                 break;
             case 0xd8:
-                if (channel.superloopCounter[0] == 1) {
-                    channel.superloopCounter[0] = 0;
-                    channel.pc = channel.superloopEndAddress[0];
-                }
+                channel.superLoops[0].skipLast();
                 break;
             case 0xd9:
-                if (channel.superloopCounter[1] == 1) {
-                    channel.superloopCounter[1] = 0;
-                    channel.pc = channel.superloopEndAddress[1];
-                }
+                channel.superLoops[1].skipLast();
                 break;
             case 0xda:
             case 0xec:
@@ -70,21 +65,17 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xe4:
                 int loopCount = channel.getNextUnsignedByte();
-                channel.superloopStartAddress[0] = loopCount;
+                channel.superLoops[0].start(loopCount);
                 break;
             case 0xe5:
-                channel.superloopEndAddress[0] = channel.pc;
-                if (--channel.superloopCounter[0] != 0) {
-                    channel.pc = channel.superloopStartAddress[0];
-                }
+                channel.superLoops[0].repeat();
                 break;
             case 0xe6:
                 jumpAddress = channel.getNextUnsignedWord();
-                channel.returnAddress[0] = channel.pc;
-                channel.pc = jumpAddress;
+                channel.routineCalls[1].subCall(jumpAddress);
                 break;
             case 0xe7:
-                channel.pc = channel.returnAddress[0];
+                channel.routineCalls[1].subReturn();
                 break;
             case 0xe8:
                 int something4 = channel.getNextUnsignedByte();
@@ -128,25 +119,21 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xf4:
                 loopCount = channel.getNextUnsignedByte();
-                channel.superloopStartAddress[1] = loopCount;
+                channel.superLoops[1].start(loopCount);
                 break;
             case 0xf5:
-                channel.superloopEndAddress[1] = channel.pc;
-                if (--channel.superloopCounter[1] != 0) {
-                    channel.pc = channel.superloopStartAddress[1];
-                }
+                channel.superLoops[1].repeat();
                 break;
             case 0xf6:
                 jumpAddress = channel.getNextUnsignedWord();
-                channel.returnAddress[1] = channel.pc;
-                channel.pc = jumpAddress;
+                channel.routineCalls[2].subCall(jumpAddress);
                 break;
             case 0xf7:
-                channel.pc = channel.returnAddress[1];
+                channel.routineCalls[2].subReturn();
                 break;
             case 0xf8:
                 jumpAddress = channel.getNextUnsignedWord();
-                channel.pc = jumpAddress;
+                channel.unconditionalJump(jumpAddress);
                 break;
             case 0xf9:
                 int detune = channel.getNextUnsignedByte();
@@ -175,6 +162,7 @@ public class SpecialCommand extends HexCommand {
                 // All empty commands go here.
                 break;
         }
+        return MmlCommand.empty();
     }
     
 }

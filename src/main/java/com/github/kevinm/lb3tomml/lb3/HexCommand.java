@@ -1,5 +1,7 @@
 package com.github.kevinm.lb3tomml.lb3;
 
+import com.github.kevinm.lb3tomml.mml.MmlCommand;
+
 public abstract class HexCommand {
     
     protected final int value;
@@ -16,7 +18,7 @@ public abstract class HexCommand {
         return value;
     }
     
-    public abstract void process(SongChannel channel);
+    public abstract MmlCommand process(SongChannel channel);
     
     public static final HexCommand of(int cmd) {
         if (cmd < 0x60) {

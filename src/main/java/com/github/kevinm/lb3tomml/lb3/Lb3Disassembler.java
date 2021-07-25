@@ -14,11 +14,11 @@ public class Lb3Disassembler {
             0xf0, 0x09, 0xf0, 0x09, 0xf0, 0x09, 0xf0, 0x09,
             0xf0, 0x09, 0xf0, 0x09, 0xf0, 0x09, 0xf0, 0x09
     };
-
+    
     private static final int VAR_RAM_ADDRESS = 0x0000;
     private static final int MUSIC_ENGINE_ADDRESS = 0x0500;
     private static final int SAMPLE_POINTERS_ADDRESS = 0x3000;
-    private static final int SONG_DATA_ADDRESS = 0xF800;
+    private static final int SONG_DATA_ADDRESS = 0xf800;
 
     private static final int CHANNEL_NUM = 8;
 
@@ -37,10 +37,11 @@ public class Lb3Disassembler {
     }
 
     public void disassemble() {
-        // Create all the channels.
+        // Create and process all the channels.
         for (int i = 0; i < CHANNEL_NUM; i++) {
             int channelId = aram.getUnsignedByte(SONG_DATA_ADDRESS + 3*i);
             int channelAddress = aram.getUnsignedWord(SONG_DATA_ADDRESS + 3*i + 1);
+            System.out.println(String.format("Processing channel %d at address 0x%04x", channelId, channelAddress));
             SongChannel channel = new SongChannel(aram, channelId, channelAddress);
             channels[i] = channel;
             channel.disassemble();
