@@ -22,6 +22,10 @@ public class MmlCommand {
         return new MmlCommand("");
     }
     
+    public boolean isEmpty() {
+        return command == null || "".equals(command);
+    }
+    
     public int getAddress() {
         return address;
     }

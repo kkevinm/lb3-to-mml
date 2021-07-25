@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.github.kevinm.lb3tomml.spc.Aram;
 import com.github.kevinm.lb3tomml.spc.Spc;
 import com.github.kevinm.lb3tomml.spc.SpcException;
+import com.github.kevinm.lb3tomml.util.Log;
 
 public class Lb3Disassembler {
 
@@ -41,10 +42,16 @@ public class Lb3Disassembler {
         for (int i = 0; i < CHANNEL_NUM; i++) {
             int channelId = aram.getUnsignedByte(SONG_DATA_ADDRESS + 3*i);
             int channelAddress = aram.getUnsignedWord(SONG_DATA_ADDRESS + 3*i + 1);
-            System.out.println(String.format("Processing channel %d at address 0x%04x", channelId, channelAddress));
+            
+            Log.log("Processing channel %d at address 0x%04x", channelId, channelAddress);
+            Log.indent();
+            
             SongChannel channel = new SongChannel(aram, channelId, channelAddress);
             channels[i] = channel;
             channel.disassemble();
+            
+            Log.unindent();
+            Log.newLine();
         }
     }
 

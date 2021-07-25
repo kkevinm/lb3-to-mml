@@ -14,6 +14,9 @@ public class SpecialCommand extends HexCommand {
 
     @Override
     public MmlCommand process(SongChannel channel) {
+        int par1;
+        int par2;
+        
         switch (value) {
             case 0xc0:
                 // TODO
@@ -39,8 +42,8 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xd6:
-                int jumpAddress = channel.getNextUnsignedWord();
-                channel.routineCalls[0].subCall(jumpAddress);
+                par1 = channel.getNextUnsignedWord();
+                channel.routineCalls[0].subCall(par1);
                 break;
             case 0xd7:
                 channel.routineCalls[0].subReturn();
@@ -53,7 +56,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xda:
             case 0xec:
-                int something6 = channel.getNextUnsignedWord();
+                par1 = channel.getNextUnsignedWord();
                 // TODO
                 break;
             case 0xe2:
@@ -64,21 +67,21 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xe4:
-                int loopCount = channel.getNextUnsignedByte();
-                channel.superLoops[0].start(loopCount);
+                par1 = channel.getNextUnsignedByte();
+                channel.superLoops[0].start(par1);
                 break;
             case 0xe5:
                 channel.superLoops[0].repeat();
                 break;
             case 0xe6:
-                jumpAddress = channel.getNextUnsignedWord();
-                channel.routineCalls[1].subCall(jumpAddress);
+                par1 = channel.getNextUnsignedWord();
+                channel.routineCalls[1].subCall(par1);
                 break;
             case 0xe7:
                 channel.routineCalls[1].subReturn();
                 break;
             case 0xe8:
-                int something4 = channel.getNextUnsignedByte();
+                par1 = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xe9:
@@ -88,7 +91,7 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xeb:
-                int something5 = channel.getNextUnsignedByte();
+                par1 = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xed:
@@ -118,33 +121,33 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xf4:
-                loopCount = channel.getNextUnsignedByte();
-                channel.superLoops[1].start(loopCount);
+                par1 = channel.getNextUnsignedByte();
+                channel.superLoops[1].start(par1);
                 break;
             case 0xf5:
                 channel.superLoops[1].repeat();
                 break;
             case 0xf6:
-                jumpAddress = channel.getNextUnsignedWord();
-                channel.routineCalls[2].subCall(jumpAddress);
+                par1 = channel.getNextUnsignedWord();
+                channel.routineCalls[2].subCall(par1);
                 break;
             case 0xf7:
                 channel.routineCalls[2].subReturn();
                 break;
             case 0xf8:
-                jumpAddress = channel.getNextUnsignedWord();
-                channel.unconditionalJump(jumpAddress);
+                par1 = channel.getNextUnsignedWord();
+                channel.unconditionalJump(par1);
                 break;
             case 0xf9:
                 int detune = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xfa:
-                int something = channel.getNextUnsignedByte();
+                par1 = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xfb:
-                int something2 = channel.getNextUnsignedByte();
+                par1 = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xfc:
@@ -154,7 +157,7 @@ public class SpecialCommand extends HexCommand {
                 // TODO
                 break;
             case 0xfe:
-                int something3 = channel.getNextUnsignedByte();
+                par1 = channel.getNextUnsignedByte();
                 // TODO
                 break;
             case 0xff:

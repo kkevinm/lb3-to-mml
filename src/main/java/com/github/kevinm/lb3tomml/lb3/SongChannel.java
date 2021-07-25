@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.spc.Aram;
+import com.github.kevinm.lb3tomml.util.Log;
 
 public class SongChannel {
     
@@ -15,8 +16,10 @@ public class SongChannel {
     final int startAddress;
 
     // Runtime variables
-    int pc = 0;
-    int currentLength = 0;
+    private int pc = 0;
+    private int currentLength = 0;
+    private int currentOctave = 0;
+    
     final SuperLoop[] superLoops = {
             new SuperLoop(), new SuperLoop()
     };
@@ -32,23 +35,25 @@ public class SongChannel {
         this.id = id;
         this.startAddress = startAddress;
     }
-
-    public void disassemble() {
-        pc = startAddress;
-        end = false;
-
-        while (!end) { // NOSONAR
-            int cmdAddr = pc;
-            int cmd = aram.getUnsignedByte(pc++);
-            System.out.println(String.format("Processing command 0x%02x on channel %d", cmd, id));
-            HexCommand hexCommand = HexCommand.of(cmd);
-            MmlCommand mmlCommand = hexCommand.process(this);
-            if (mmlCommand == null) {
-                mmlCommand = MmlCommand.empty();
-            }
-            mmlCommand.setAddress(cmdAddr);
-            commands.add(mmlCommand);
-        }
+    
+    public int getCurrentLength() {
+        return currentLength;
+    }
+    
+    public void setCurrentLength(int currentLength) {
+        this.currentLength = currentLength;
+    }
+    
+    public int getCurrentOctave() {
+        return currentOctave;
+    }
+    
+    public void setCurrentOctave(int currentOctave) {
+        this.currentOctave = currentOctave;
+    }
+    
+    public String getTickLength() {
+        return "=" + currentLength;
     }
 
     public int getNextSignedByte() {
@@ -83,6 +88,29 @@ public class SongChannel {
         return next;
     }
     
+    public void disassemble() {
+        pc = startAddress;
+        end = false;
+
+        while (!end) {
+            int cmdAddr = pc;
+            int cmd = aram.getUnsignedByte(pc++);
+            
+            Log.log("Processing command 0x%02x in channel %d at address 0x%04x", cmd, id, cmdAddr);
+            Log.indent();
+            
+            HexCommand hexCommand = HexCommand.of(cmd);
+            MmlCommand mmlCommand = hexCommand.process(this);
+            if (mmlCommand == null) {
+                mmlCommand = MmlCommand.empty();
+            }
+            mmlCommand.setAddress(cmdAddr);
+            commands.add(mmlCommand);
+            
+            Log.unindent();
+        }
+    }
+    
     public void unconditionalJump(int address) {
         // We need to check if the target address was already visited.
         // If yes, it means the address is a loop point.
@@ -91,15 +119,13 @@ public class SongChannel {
                 MmlCommand intro = new MmlCommand(address, MmlSymbol.INTRO);
                 commands.add(i, intro);
                 end = true;
-                System.out.println(String.format("Detected channel %d loop point at 0x%02x", id, address));
+                Log.log("Detected channel %d loop point at 0x%02x", id, address);
                 return;
             }
         }
         
         // If it's not the loop point, jump there.
-        if (!end) {
-            pc = address;
-        }
+        pc = address;
     }
 
     public final class RoutineCall {

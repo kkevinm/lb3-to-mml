@@ -2,6 +2,7 @@ package com.github.kevinm.lb3tomml.lb3;
 
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
+import com.github.kevinm.lb3tomml.util.Log;
 
 public class NoteCommand extends HexCommand {
     
@@ -16,7 +17,15 @@ public class NoteCommand extends HexCommand {
     }
     
     public String getName() {
-        return MmlSymbol.NOTES[value % 12];
+        if (isNote()) {
+            return MmlSymbol.NOTES[value % 12];
+        } else if (isRest()) {
+            return MmlSymbol.REST;
+        } else if (isTie()) {
+            return MmlSymbol.TIE;
+        } else {
+            return MmlSymbol.NOISE;
+        }
     }
     
     public int getOctave() {
@@ -45,8 +54,48 @@ public class NoteCommand extends HexCommand {
 
     @Override
     public MmlCommand process(SongChannel channel) {
-        // TODO
-        return MmlCommand.empty();
+        StringBuilder newNote = new StringBuilder();
+        
+        if (isNoise()) {
+            newNote.append(getName());
+            newNote.append(String.format("%02x", getNoiseFrequency()));
+            newNote.append(" c");
+        } else if(isNote()) {
+            int currentOctave = channel.getCurrentOctave();
+            int newOctave = getOctave();
+            if (currentOctave == 0) {
+                newNote.append(MmlSymbol.OCTAVE);
+                newNote.append(newOctave);
+                newNote.append(' ');
+            } else if (currentOctave != newOctave) {
+                newNote.append(getOctaveChange(currentOctave, newOctave));
+                newNote.append(' ');
+            }
+            newNote.append(getName());
+            channel.setCurrentOctave(newOctave);
+        } else {
+            newNote.append(getName());
+        }
+        
+        MmlCommand result = new MmlCommand(newNote.toString(), channel.getTickLength());
+        
+        Log.log("Processing note 0x%02x", value);
+        Log.indent();
+        Log.log("Note: %s - Rest: %s - Tie: %s - Noise: %s", isNote(), isRest(), isTie(), isNoise());
+        Log.log("Name: %s - Octave: %d - Length: %d", getName(), getOctave(), channel.getCurrentLength());
+        Log.log("Converted as: %s", result.toString());
+        Log.unindent();
+        
+        return result;
+    }
+    
+    private String getOctaveChange(int currentOctave, int newOctave) {
+        StringBuilder res = new StringBuilder();
+        char symbol = currentOctave > newOctave ? '<' : '>';
+        for (int i = 0; i < Math.abs(currentOctave-newOctave); i++) {
+            res.append(symbol);
+        }
+        return res.toString();
     }
     
 }
