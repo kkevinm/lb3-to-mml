@@ -33,12 +33,6 @@ public class SpecialCommand extends HexCommand {
                 par1 = channel.getNextUnsignedByte();
                 newCommand = MmlCommand.hex(MmlSymbol.ADSR, 0xff-0x80, par1);
                 break;
-            case 0xd0:
-                unsupported(value);
-                break;
-            case 0xd1:
-                unsupported(value);
-                break;
             case 0xd2:
             case 0xe0:
                 par1 = channel.getNextUnsignedByte();
@@ -91,23 +85,6 @@ public class SpecialCommand extends HexCommand {
             case 0xe9:
                 newCommand = MmlCommand.hex(MmlSymbol.VIBRATO_OFF);
                 break;
-            case 0xea:
-                unsupported(value);
-                break;
-            case 0xeb:
-                channel.getNextUnsignedByte();
-                unsupported(value);
-                break;
-            case 0xed:
-                channel.getNextUnsignedByte();
-                unsupported(value);
-                break;
-            case 0xee:
-                unsupported(value);
-                break;
-            case 0xef:
-                unsupported(value);
-                break;
             case 0xf0:
                 par1 = channel.getNextUnsignedByte();
                 par2 = channel.getNextUnsignedByte();
@@ -147,27 +124,32 @@ public class SpecialCommand extends HexCommand {
                 par1 = channel.getNextUnsignedByte();
                 newCommand = MmlCommand.hex(MmlSymbol.DETUNE, par1);
                 break;
-            case 0xfa:
-                channel.getNextUnsignedByte();
-                unsupported(value);
-                break;
-            case 0xfb:
-                channel.getNextUnsignedByte();
-                unsupported(value);
-                break;
             case 0xfc:
                 newCommand = buildLegatoCommand(channel, true);
                 break;
             case 0xfd:
                 newCommand = buildLegatoCommand(channel, false);
                 break;
+            case 0xeb:
+            case 0xed:
+            case 0xfa:
+            case 0xfb:
             case 0xfe:
+                // Unknown commands with 1 parameter
                 channel.getNextUnsignedByte();
+                unsupported(value);
+                break;
+            case 0xd0:
+            case 0xd1:
+            case 0xea:
+            case 0xee:
+            case 0xef:
+                // Unknown commands with no parameter
                 unsupported(value);
                 break;
             case 0xff:
             default:
-                // All empty commands go here.
+                // "NOP" commands
                 break;
         }
         if (!newCommand.isEmpty()) {
