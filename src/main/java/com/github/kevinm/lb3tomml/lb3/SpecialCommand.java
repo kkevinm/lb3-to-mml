@@ -1,6 +1,7 @@
 package com.github.kevinm.lb3tomml.lb3;
 
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
+import com.github.kevinm.lb3tomml.mml.MmlMacro;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.util.Log;
 import com.github.kevinm.lb3tomml.util.Util;
@@ -23,10 +24,10 @@ public class SpecialCommand extends HexCommand {
         
         switch (value) {
             case 0xc0:
-                // TODO
+                newCommand = buildInstrumentCommand(0x00);
                 break;
             case 0xc1:
-                // TODO
+                newCommand = buildInstrumentCommand(0x01);
                 break;
             case 0xcf:
                 par1 = channel.getNextUnsignedByte();
@@ -64,11 +65,11 @@ public class SpecialCommand extends HexCommand {
                 unsupported(value);
                 break;
             case 0xe2:
-                unsupported(value);
+                newCommand = MmlCommand.hex(MmlSymbol.PITCH_ENVELOPE_OFF);
                 break;
             case 0xe3:
-                int bendSpeed = channel.getNextSignedByte();
-                // TODO
+                channel.getNextSignedByte();
+                newCommand = MmlCommand.hex(MmlSymbol.PITCH_ENVELOPE_TO, 0x00, channel.getCurrentLength(), 0x69);
                 break;
             case 0xe4:
                 par1 = channel.getNextUnsignedByte();
@@ -86,10 +87,10 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xe8:
                 channel.getNextUnsignedByte();
-                unsupported(value);
+                newCommand = MmlCommand.hex(MmlSymbol.VIBRATO, 0x00, 0x69, 0x69);
                 break;
             case 0xe9:
-                unsupported(value);
+                newCommand = MmlCommand.hex(MmlSymbol.VIBRATO_OFF);
                 break;
             case 0xea:
                 unsupported(value);
@@ -100,6 +101,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xed:
                 channel.getNextUnsignedByte();
+                unsupported(value);
                 break;
             case 0xee:
                 unsupported(value);
@@ -113,15 +115,15 @@ public class SpecialCommand extends HexCommand {
                 newCommand = MmlCommand.hex(MmlSymbol.ADSR, par1-0x80, par2);
                 break;
             case 0xf1:
-                int sampleNumber = channel.getNextUnsignedByte();
-                // TODO
+                par1 = channel.getNextUnsignedByte();
+                newCommand = buildInstrumentCommand(par1);
                 break;
             case 0xf2:
                 par1 = channel.getNextUnsignedByte();
                 newCommand = buildVolumeCommand(par1);
                 break;
             case 0xf3:
-                par1 = channel.getNextSignedByte();
+                par1 = channel.getNextUnsignedByte();
                 newCommand = MmlCommand.hex(MmlSymbol.CHANNEL_TRANSPOSE, par1);
                 break;
             case 0xf4:
@@ -178,8 +180,12 @@ public class SpecialCommand extends HexCommand {
     private void unsupported(int command) {
         Log.logIndent("Unsupported command 0x%02x", command);
     }
-    
-    private static MmlCommand buildVolumeCommand(int volume) {
+
+    private MmlCommand buildInstrumentCommand(int value) {
+        return new MmlCommand(MmlMacro.INSTRUMENT, String.format("%02x", value));
+    }
+
+    private MmlCommand buildVolumeCommand(int volume) {
         int result = 0x7f - volume;
         
         if (result <= 0x4d) {

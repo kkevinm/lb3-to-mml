@@ -20,9 +20,11 @@ public abstract class HexCommand {
     
     public abstract MmlCommand process(SongChannel channel);
     
-    public static final HexCommand of(int cmd) {
+    public static HexCommand of(int cmd) {
         if (cmd < 0x60) {
             return new NoteCommand(cmd);
+        } else if (cmd < 0x80) {
+            return new PanCommand(cmd);
         } else if (cmd < 0xc0) {
             return new LengthCommand(cmd);
         } else {

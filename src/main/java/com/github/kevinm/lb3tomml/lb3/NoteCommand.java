@@ -55,7 +55,12 @@ public class NoteCommand extends HexCommand {
     @Override
     public MmlCommand process(SongChannel channel) {
         StringBuilder newNote = new StringBuilder();
-        
+
+        if (value == 0x3e) {
+            Log.log("Unsupported command 0x3e");
+            return MmlCommand.empty();
+        }
+
         if (isNoise()) {
             newNote.append(getName());
             newNote.append(String.format("%02x", getNoiseFrequency()));
