@@ -22,6 +22,7 @@ public class SongChannel {
     private int currentLength = 0;
     private int currentOctave = 0;
     private int currentTicks = 0;
+    private boolean amplified = false;
     private boolean firstNote = true;
     private boolean legatoOn = false;
     
@@ -65,6 +66,14 @@ public class SongChannel {
             
             Log.unindent();
         }
+    }
+
+    public boolean isAmplified() {
+        return amplified;
+    }
+
+    public void setAmplified(boolean amplified) {
+        this.amplified = amplified;
     }
     
     public int getCurrentLength() {

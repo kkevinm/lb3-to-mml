@@ -120,7 +120,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xf2:
                 par1 = channel.getNextUnsignedByte();
-                newCommand = buildVolumeCommand(par1);
+                newCommand = buildVolumeCommand(channel, par1);
                 break;
             case 0xf3:
                 par1 = channel.getNextUnsignedByte();
@@ -196,20 +196,30 @@ public class SpecialCommand extends HexCommand {
         return new MmlCommand(MmlMacro.INSTRUMENT, String.format("%02x", value));
     }
 
-    private MmlCommand buildVolumeCommand(int volume) {
+    private MmlCommand buildVolumeCommand(SongChannel channel, int volume) {
         int result = 0x7f - volume;
         
         if (result <= 0x4d) {
             result = (int) Math.ceil(Math.sqrt(841.53722309 * result));
-            return MmlCommand.dec(MmlSymbol.VOLUME, result);
+            MmlCommand command = MmlCommand.dec(MmlSymbol.VOLUME, result);
+            if (channel.isAmplified()) {
+                channel.setAmplified(false);
+                addAmplifyCommand(command, 0x00);
+            }
+            return command;
         } else {
+            channel.setAmplified(true);
             int amp = (int) Math.ceil(256.0 * result / 0x4d - 256.0) & 0xff;
             MmlCommand command = MmlCommand.dec(MmlSymbol.VOLUME, 255);
-            command.addParameter(" ");
-            command.addParameter(MmlSymbol.AMPLIFY);
-            command.addParameter(Util.hexString(amp));
+            addAmplifyCommand(command, amp);
             return command;
         }
+    }
+
+    private void addAmplifyCommand(MmlCommand command, int amp) {
+        command.addParameter(" ");
+        command.addParameter(MmlSymbol.AMPLIFY);
+        command.addParameter(Util.hexString(amp));
     }
     
 }
