@@ -19,6 +19,8 @@ public class SongChannel {
     private int pc = 0;
     private int currentLength = 0;
     private int currentOctave = 0;
+
+    private boolean legatoOn = false;
     
     final SuperLoop[] superLoops = {
             new SuperLoop(), new SuperLoop()
@@ -76,6 +78,14 @@ public class SongChannel {
     
     public void setCurrentOctave(int currentOctave) {
         this.currentOctave = currentOctave;
+    }
+
+    public boolean getLegato() {
+        return legatoOn;
+    }
+
+    public void setLegato(boolean on) {
+        this.legatoOn = on;
     }
     
     public String getTickLength() {

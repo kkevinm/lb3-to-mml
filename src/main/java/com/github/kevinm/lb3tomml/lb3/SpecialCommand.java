@@ -157,10 +157,10 @@ public class SpecialCommand extends HexCommand {
                 unsupported(value);
                 break;
             case 0xfc:
-                unsupported(value);
+                newCommand = buildLegatoCommand(channel, true);
                 break;
             case 0xfd:
-                unsupported(value);
+                newCommand = buildLegatoCommand(channel, false);
                 break;
             case 0xfe:
                 channel.getNextUnsignedByte();
@@ -179,6 +179,17 @@ public class SpecialCommand extends HexCommand {
     
     private void unsupported(int command) {
         Log.logIndent("Unsupported command 0x%02x", command);
+    }
+
+    private MmlCommand buildLegatoCommand(SongChannel channel, boolean legato) {
+        boolean currentLegato = channel.getLegato();
+
+        if (currentLegato != legato) {
+            channel.setLegato(legato);
+            return new MmlCommand(MmlSymbol.LEGATO_TOGGLE);
+        } else {
+            return MmlCommand.empty();
+        }
     }
 
     private MmlCommand buildInstrumentCommand(int value) {
