@@ -17,7 +17,7 @@ public final class Main {
         // For quick testing
         // TODO: remove
         //args = new String[] {"04 Memories.spc"};
-        args = new String[] {"53 Underworld Forest.spc"};
+        args = new String[] {"05 Light.spc"};
         //
         
         if (args.length < 1) {

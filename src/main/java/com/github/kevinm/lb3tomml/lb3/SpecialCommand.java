@@ -41,10 +41,9 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xd2:
             case 0xe0:
-                // e0 also sets the tempo in a different variable...
                 par1 = channel.getNextUnsignedByte();
-                // TODO: figure out conversion to N-SPC tempo
-                newCommand = MmlCommand.dec(MmlSymbol.TEMPO, par1);
+                int tempo = (int) Math.round(4000.0 / ((par1 + 0x80) & 0xff));
+                newCommand = MmlCommand.dec(MmlSymbol.TEMPO, tempo);
                 break;
             case 0xd6:
                 par1 = channel.getNextUnsignedWord();
