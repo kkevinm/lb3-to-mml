@@ -22,6 +22,14 @@ public class MmlCommand {
         this.command = command;
         this.parameters = new ArrayList<>(Arrays.asList(parameters));
     }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
+    }
     
     public static MmlCommand empty() {
         return new MmlCommand("");

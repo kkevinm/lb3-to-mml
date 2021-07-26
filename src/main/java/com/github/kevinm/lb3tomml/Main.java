@@ -1,5 +1,6 @@
 package com.github.kevinm.lb3tomml;
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.github.kevinm.lb3tomml.lb3.Lb3Disassembler;
@@ -14,12 +15,6 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        // For quick testing
-        // TODO: remove
-        //args = new String[] {"04 Memories.spc"};
-        args = new String[] {"05 Light.spc"};
-        //
-        
         if (args.length < 1) {
             System.out.println("Error: not enough parameters!");
             System.out.println("Usage: java -jar lib3-to-mml.jar <spc file>");
@@ -48,11 +43,17 @@ public final class Main {
         String outputName = baseName + ".txt";
         String logName = baseName + ".log";
         
-        Log.enableLog();
+        // Log.enableLog();
         Log.openLogFile(logName);
         
-        disassembler.disassemble();
-        
+        String output = disassembler.disassemble();
+
+        try (FileWriter fileWriter = new FileWriter(outputName)) {
+            fileWriter.write(output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Log.closeLogFile();
     }
     

@@ -32,6 +32,10 @@ public final class Log {
     }
     
     public static void openLogFile(String fileName) {
+        if (!logEnabled) {
+            return;
+        }
+
         closeLogFile();
         
         try {

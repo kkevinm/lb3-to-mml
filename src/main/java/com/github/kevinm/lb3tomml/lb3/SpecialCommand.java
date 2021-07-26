@@ -1,7 +1,6 @@
 package com.github.kevinm.lb3tomml.lb3;
 
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
-import com.github.kevinm.lb3tomml.mml.MmlMacro;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.util.Log;
 import com.github.kevinm.lb3tomml.util.Util;
@@ -24,10 +23,10 @@ public class SpecialCommand extends HexCommand {
         
         switch (value) {
             case 0xc0:
-                newCommand = buildInstrumentCommand(0x00);
+                newCommand = channel.buildInstrumentCommand(0x00);
                 break;
             case 0xc1:
-                newCommand = buildInstrumentCommand(0x01);
+                newCommand = channel.buildInstrumentCommand(0x01);
                 break;
             case 0xcf:
                 par1 = channel.getNextUnsignedByte();
@@ -92,7 +91,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xf1:
                 par1 = channel.getNextUnsignedByte();
-                newCommand = buildInstrumentCommand(par1);
+                newCommand = channel.buildInstrumentCommand(par1);
                 break;
             case 0xf2:
                 par1 = channel.getNextUnsignedByte();
@@ -171,10 +170,6 @@ public class SpecialCommand extends HexCommand {
         } else {
             return MmlCommand.empty();
         }
-    }
-
-    private MmlCommand buildInstrumentCommand(int value) {
-        return new MmlCommand(MmlMacro.INSTRUMENT, String.format("%02x", value));
     }
 
     private MmlCommand buildVolumeCommand(SongChannel channel, int volume) {

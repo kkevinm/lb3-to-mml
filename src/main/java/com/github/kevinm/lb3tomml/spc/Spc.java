@@ -24,12 +24,12 @@ public class Spc {
     public final byte y;
     public final byte psw;
     public final byte sp;
-    public final Optional<Id666Tag> id666Tag;
+    public final Id666Tags id666Tags;
     public final byte[] ram;
     public final byte[] regs;
     public final byte[] iplRom;
     
-    public Spc(byte version, short pc, byte a, byte x, byte y, byte psw, byte sp, Id666Tag id666Tag,
+    public Spc(byte version, short pc, byte a, byte x, byte y, byte psw, byte sp, Id666Tags id666Tags,
             byte[] ram, byte[] regs, byte[] iplRom) {
         if(ram.length != RAM_LEN || regs.length != REG_LEN || iplRom.length != IPL_ROM_LEN) {
             throw new IllegalArgumentException("Illegal arguments provided");
@@ -41,8 +41,7 @@ public class Spc {
         this.y = y;
         this.psw = psw;
         this.sp = sp;
-        this.id666Tag = id666Tag == null ?
-                Optional.empty() : Optional.of(id666Tag);
+        this.id666Tags = id666Tags;
         this.ram = ram;
         this.regs = regs;
         this.iplRom = iplRom;
@@ -87,11 +86,11 @@ public class Spc {
             byte psw = reader.readByte();
             byte sp = reader.readByte();
             
-            Id666Tag id666Tag = null;
+            Id666Tags id666Tags = null;
             
             if(hasId666Tag) {
                 reader.seek(0x2E);
-                id666Tag = Id666Tag.getId666Tag(reader);
+                id666Tags = Id666Tags.getId666Tag(reader);
             }
             
             byte[] ram = new byte[RAM_LEN];
@@ -105,11 +104,11 @@ public class Spc {
             reader.read(iplRom);
             
             return new Spc(version, pc, a, x, y, psw,
-                    sp, id666Tag, ram, regs, iplRom);
+                    sp, id666Tags, ram, regs, iplRom);
         }
     }
     
-    public static class Id666Tag {
+    public static class Id666Tags {
         public final String songTitle;
         public final String gameTitle;
         public final String dumperName;
@@ -121,7 +120,7 @@ public class Spc {
         public final byte defaultChannelDisables;
         public final SnesEmulator dumpEmulator;
         
-        Id666Tag(String songTitle, String gameTitle, String dumperName, String comments, LocalDate dumpDate,
+        Id666Tags(String songTitle, String gameTitle, String dumperName, String comments, LocalDate dumpDate,
                 int secondsBeforeFadeOut, int fadeOutLength, String artistName, byte defaultChannelDisables,
                 SnesEmulator dumpEmulator) {
             this.songTitle = songTitle;
@@ -146,10 +145,10 @@ public class Spc {
          * file position pointer (for SPC files this must be 0x2E).
          * 
          * @param  file
-         * @return an {@link Id666Tag}
+         * @return an {@link Id666Tags}
          * @throws IOException 
          */
-        static Id666Tag getId666Tag(RandomAccessFile file) throws IOException {
+        static Id666Tags getId666Tag(RandomAccessFile file) throws IOException {
             String songTitle = readString(file, 32);
             String gameTitle = readString(file, 32);
             String dumperName = readString(file, 16);
@@ -193,7 +192,7 @@ public class Spc {
             byte defaultChannelDisables = file.readByte();
             SnesEmulator dumpEmulator = SnesEmulator.fromId(getDigit(file.readByte()));
             
-            return new Id666Tag(songTitle, gameTitle, dumperName, comments, dumpDate,
+            return new Id666Tags(songTitle, gameTitle, dumperName, comments, dumpDate,
                     secondsBeforeFadeOut, fadeOutLength, artistName, defaultChannelDisables, dumpEmulator);
         }
         
@@ -239,7 +238,7 @@ public class Spc {
         }
         
         /**
-         * Reads up to {@link maxLength} bytes and encodes them as an integer.
+         * Reads up to maxLength bytes and encodes them as an integer.
          * If the terminator is found, the read stops.
          * 
          * @param file

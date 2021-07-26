@@ -1,12 +1,15 @@
 package com.github.kevinm.lb3tomml.lb3;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.kevinm.lb3tomml.mml.MmlCommand;
+import com.github.kevinm.lb3tomml.mml.MmlMacro;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.spc.Aram;
 import com.github.kevinm.lb3tomml.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class SongChannel {
 
@@ -34,6 +37,7 @@ public class SongChannel {
     };
 
     private final List<MmlCommand> commands = new ArrayList<>();
+    private final Set<Integer> instruments = new TreeSet<>();
     private boolean end;
 
     SongChannel(Aram aram, int id, int startAddress) {
@@ -41,13 +45,25 @@ public class SongChannel {
         this.id = id;
         this.startAddress = startAddress;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        for (MmlCommand command: commands) {
+            String cmdString = command.toString();
+            output.append(cmdString);
+            if (!cmdString.contains("\n") && !cmdString.equals("")) {
+                output.append(" ");
+            }
+        }
+        return output.toString();
+    }
     
     public void disassemble() {
         pc = startAddress;
         end = false;
         
         commands.add(MmlCommand.dec(MmlSymbol.CHANNEL, id));
-        commands.add(new MmlCommand("\n\n"));
         
         while (!end) {
             int cmdAddr = pc;
@@ -66,6 +82,14 @@ public class SongChannel {
             
             Log.unindent();
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Set<Integer> getInstruments() {
+        return instruments;
     }
 
     public boolean isAmplified() {
@@ -114,6 +138,10 @@ public class SongChannel {
         commands.add(command);
     }
 
+    public List<MmlCommand> getCommands() {
+        return commands;
+    }
+
     public boolean isFirstNote() {
         boolean isFirstNote = firstNote;
         this.firstNote = false;
@@ -154,6 +182,11 @@ public class SongChannel {
         int next = aram.getUnsignedLong(pc);
         pc += 3;
         return next;
+    }
+
+    public MmlCommand buildInstrumentCommand(int value) {
+        instruments.add(value);
+        return new MmlCommand(MmlMacro.INSTRUMENT, String.format("%02x", value));
     }
     
     public void unconditionalJump(int address) {
