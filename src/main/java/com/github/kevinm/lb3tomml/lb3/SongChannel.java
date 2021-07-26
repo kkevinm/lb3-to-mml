@@ -9,17 +9,20 @@ import com.github.kevinm.lb3tomml.spc.Aram;
 import com.github.kevinm.lb3tomml.util.Log;
 
 public class SongChannel {
-    
+
+    private static final int MEASURE_LENGTH = 192;
+
     // Constants
-    final Aram aram;
-    final int id;
-    final int startAddress;
+    private final Aram aram;
+    private final int id;
+    private final int startAddress;
 
     // Runtime variables
     private int pc = 0;
     private int currentLength = 0;
     private int currentOctave = 0;
-
+    private int currentTicks = 0;
+    private boolean firstNote = true;
     private boolean legatoOn = false;
     
     final SuperLoop[] superLoops = {
@@ -80,12 +83,32 @@ public class SongChannel {
         this.currentOctave = currentOctave;
     }
 
-    public boolean getLegato() {
+    public boolean isLegatoOn() {
         return legatoOn;
     }
 
     public void setLegato(boolean on) {
         this.legatoOn = on;
+    }
+
+    public boolean addTicks(int ticks) {
+        currentTicks += ticks;
+        if (currentTicks >= MEASURE_LENGTH) {
+            currentTicks = 0;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void addCommand(MmlCommand command) {
+        commands.add(command);
+    }
+
+    public boolean isFirstNote() {
+        boolean isFirstNote = firstNote;
+        this.firstNote = false;
+        return isFirstNote;
     }
     
     public String getTickLength() {
@@ -145,6 +168,11 @@ public class SongChannel {
         pc = address;
     }
 
+    private void forceNewLine() {
+        SongChannel.this.addCommand(MmlCommand.newline());
+        SongChannel.this.currentTicks = 0;
+    }
+
     public final class RoutineCall {
 
         private int returnAddress = 0;
@@ -152,6 +180,7 @@ public class SongChannel {
         public void subCall(int address) {
             returnAddress = SongChannel.this.pc;
             SongChannel.this.pc = address;
+            SongChannel.this.forceNewLine();
             
             Log.log("Processing call subroutine command");
             Log.logIndent("Jump address: 0x%04x - Return address: 0x%04x", address, returnAddress);
@@ -159,6 +188,7 @@ public class SongChannel {
 
         public void subReturn() {
             SongChannel.this.pc = returnAddress;
+            SongChannel.this.forceNewLine();
             
             Log.log("Processing return from subroutine command");
             Log.logIndent("Returning to address 0x%04x", returnAddress);
@@ -175,7 +205,8 @@ public class SongChannel {
         public void start(int counter) {
             this.counter = counter;
             this.startAddress = SongChannel.this.pc;
-            
+            SongChannel.this.forceNewLine();
+
             Log.log("Processing superloop start command");
             Log.logIndent("Start address: 0x%04x - Counter: %d", startAddress, counter);
         }
@@ -183,6 +214,7 @@ public class SongChannel {
         public void repeat() {
             counter--;
             endAddress = SongChannel.this.pc;
+            SongChannel.this.forceNewLine();
             
             Log.log("Processing superloop repeat command");
             Log.indent();
@@ -204,6 +236,8 @@ public class SongChannel {
             if (counter == 1) {
                 counter = 0;
                 SongChannel.this.pc = endAddress;
+                SongChannel.this.forceNewLine();
+
                 Log.logIndent("Counter is 1: jumping to 0x%04x", endAddress);
             }
         }

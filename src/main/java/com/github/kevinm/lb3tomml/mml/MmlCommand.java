@@ -26,6 +26,10 @@ public class MmlCommand {
     public static MmlCommand empty() {
         return new MmlCommand("");
     }
+
+    public static MmlCommand newline() {
+        return new MmlCommand("\n");
+    }
     
     public static MmlCommand hex(String command, int... parameters) {
         String[] pars = Arrays.stream(parameters)

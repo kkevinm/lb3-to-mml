@@ -182,7 +182,7 @@ public class SpecialCommand extends HexCommand {
     }
 
     private MmlCommand buildLegatoCommand(SongChannel channel, boolean legato) {
-        boolean currentLegato = channel.getLegato();
+        boolean currentLegato = channel.isLegatoOn();
 
         if (currentLegato != legato) {
             channel.setLegato(legato);

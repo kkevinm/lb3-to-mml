@@ -83,13 +83,23 @@ public class NoteCommand extends HexCommand {
         }
         
         MmlCommand result = new MmlCommand(newNote.toString(), channel.getTickLength());
-        
+
         Log.log("Processing note 0x%02x", value);
         Log.indent();
         Log.log("Note: %s - Rest: %s - Tie: %s - Noise: %s", isNote(), isRest(), isTie(), isNoise());
         Log.log("Name: %s - Octave: %d - Length: %d", getName(), getOctave(), channel.getCurrentLength());
         Log.log("Converted to: %s", result.toString());
         Log.unindent();
+
+        boolean newLine = channel.addTicks(channel.getCurrentLength());
+        if (newLine) {
+            result.addParameter("\n");
+            Log.logIndent("End of measure detected: going on a new line");
+        }
+
+        if (channel.isFirstNote()) {
+            channel.addCommand(new MmlCommand("\n"));
+        }
         
         return result;
     }
