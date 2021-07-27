@@ -152,33 +152,17 @@ public class SongChannel {
         return "=" + currentLength;
     }
 
-    public int getNextSignedByte() {
-        return aram.getSignedByte(pc++);
-    }
-
-    public int getNextSignedWord() {
-        int next = aram.getSignedWord(pc);
-        pc += 2;
-        return next;
-    }
-
-    public int getNextSignedLong() {
-        int next = aram.getSignedLong(pc);
-        pc += 3;
-        return next;
-    }
-
-    public int getNextUnsignedByte() {
+    public int getNextByte() {
         return aram.getUnsignedByte(pc++);
     }
 
-    public int getNextUnsignedWord() {
+    public int getNextWord() {
         int next = aram.getUnsignedWord(pc);
         pc += 2;
         return next;
     }
 
-    public int getNextUnsignedLong() {
+    public int getNextLong() {
         int next = aram.getUnsignedLong(pc);
         pc += 3;
         return next;

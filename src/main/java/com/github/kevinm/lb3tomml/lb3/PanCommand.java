@@ -19,16 +19,17 @@ public class PanCommand extends HexCommand {
 	public MmlCommand process(SongChannel channel) {
 		Log.log("Processing pan command 0x%02x", value);
 
-		String cmd, pan;
+		String cmd;
+		String pan;
 		if (value == 0x60 || value == 0x70) {
 			cmd = MmlSymbol.PAN;
 			pan = "10";
 		} else if (value < 0x70) {
 			cmd = MmlMacro.PAN;
-			pan = "L" + String.valueOf(value - 0x60);
+			pan = "L" + (value - 0x60);
 		} else {
 			cmd = MmlMacro.PAN;
-			pan = "R" + String.valueOf(value - 0x70);
+			pan = "R" + (value - 0x70);
 		}
 
 		MmlCommand result = new MmlCommand(cmd, pan);

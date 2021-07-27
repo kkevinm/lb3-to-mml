@@ -12,8 +12,6 @@ public final class MmlMacro {
     public static final String QUANTIZATION = "Q";
     public static final String DEFAULT_LENGTH = "L";
     
-    private MmlMacro() {
-        
-    }
+    private MmlMacro() {}
     
 }

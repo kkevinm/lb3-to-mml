@@ -9,21 +9,46 @@ import com.github.kevinm.lb3tomml.spc.SpcException;
 import com.github.kevinm.lb3tomml.util.Log;
 
 public final class Main {
-    
-    private Main() {
-        
-    }
+
+    private static final String[][] OPTIONS = {
+            {"--log", "", "Logs the parser output into a .log file."}
+    };
+
+    private Main() {}
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Error: not enough parameters!");
-            System.out.println("Usage: java -jar lib3-to-mml.jar <spc file>");
-            System.out.println("   or: java -jar lib3-to-mml.jar *.spc");
-            return;
+            System.out.println("Error: not enough parameters!\n");
+            System.out.println("Usage: java -jar lib3-to-mml.jar [options] <spc file>");
+            System.out.println("   or: java -jar lib3-to-mml.jar [options] *.spc\n");
+            System.out.println("Possible options:");
+            for (String[] option: OPTIONS) {
+                System.out.printf("  %s\t%s\t%s%n", option[0], option[1], option[2]);
+            }
+            System.exit(-1);
+        }
+
+        int i;
+        for (i = 0; i < args.length; i++) {
+            if (!args[i].startsWith("--")) {
+                break;
+            }
+            processOption(args[i]);
         }
         
-        for (String arg: args) {
-            disassemble(arg);
+        for (; i < args.length; i++) {
+            disassemble(args[i]);
+        }
+    }
+
+    private static void processOption(String arg) {
+        switch (arg) {
+            case "--log":
+                Log.enableLog();
+                break;
+            default:
+                System.out.printf("Error: option %s was not recognised!%n", arg);
+                System.exit(-1);
         }
     }
     
@@ -42,16 +67,18 @@ public final class Main {
         String baseName = removeExtension(file);
         String outputName = baseName + ".txt";
         String logName = baseName + ".log";
-        
-        // Log.enableLog();
+
         Log.openLogFile(logName);
         
         String output = disassembler.disassemble();
+        boolean success;
 
         try (FileWriter fileWriter = new FileWriter(outputName)) {
             fileWriter.write(output);
+            System.out.printf("%s exported without errors.%n", outputName);
         } catch (IOException e) {
             e.printStackTrace();
+            success = false;
         }
 
         Log.closeLogFile();

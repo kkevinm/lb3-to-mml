@@ -18,7 +18,7 @@ public class NoteCommand extends HexCommand {
     
     public String getName() {
         if (isNote()) {
-            return MmlSymbol.NOTES[value % 12];
+            return MmlSymbol.NOTES.get(value % 12);
         } else if (isRest()) {
             return MmlSymbol.REST;
         } else if (isTie()) {

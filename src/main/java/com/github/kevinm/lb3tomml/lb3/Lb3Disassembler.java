@@ -102,7 +102,7 @@ public class Lb3Disassembler {
         output.append(";==================;\n;      Macros      ;\n;==================;\n");
         instr = 30;
         for (int sampleNum: instruments) {
-            output.append(String.format("\"%s%02x = %s%d\"\n",
+            output.append(String.format("\"%s%02x = %s%d\"%n",
                     MmlMacro.INSTRUMENT, sampleNum, MmlSymbol.INSTRUMENT, instr++));
         }
 
@@ -114,7 +114,7 @@ public class Lb3Disassembler {
 
         for (SongChannel channel: channels) {
             output.append("\n;==================;\n");
-            output.append(String.format(";    Channel #%d    ;\n", channel.getId()));
+            output.append(String.format(";    Channel #%d    ;%n", channel.getId()));
             output.append(";==================;\n");
             output.append(channel.toString());
             output.append("\n");

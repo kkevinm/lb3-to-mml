@@ -1,8 +1,14 @@
 package com.github.kevinm.lb3tomml.mml;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public final class MmlSymbol {
 
-    public static final String[] NOTES = {"c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"};
+    public static final List<String> NOTES = Collections.unmodifiableList(Arrays.asList(
+            "c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"
+    ));
     public static final String REST = "r";
     public static final String TIE = "^";
     public static final String INSTRUMENT = "@";
@@ -50,8 +56,6 @@ public final class MmlSymbol {
     public static final String CHANNEL_TRANSPOSE = "$fa$02";
     public static final String AMPLIFY = "$fa$03";
 
-    private MmlSymbol() {
-
-    }
+    private MmlSymbol() {}
 
 }

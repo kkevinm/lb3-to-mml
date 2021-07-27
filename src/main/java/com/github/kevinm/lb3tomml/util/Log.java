@@ -11,9 +11,7 @@ public final class Log {
     private static int indentation = 0;
     private static FileWriter logFile;
     
-    private Log() {
-        
-    }
+    private Log() {}
     
     public static void enableLog() {
         logEnabled = true;
@@ -32,17 +30,14 @@ public final class Log {
     }
     
     public static void openLogFile(String fileName) {
-        if (!logEnabled) {
-            return;
-        }
-
-        closeLogFile();
-        
-        try {
-            logFile = new FileWriter(fileName);
-        } catch (IOException e) {
-            logFile = null;
-            e.printStackTrace();
+        if (logEnabled) {
+            closeLogFile();
+            try {
+                logFile = new FileWriter(fileName);
+            } catch (IOException e) {
+                logFile = null;
+                e.printStackTrace();
+            }
         }
     }
     
@@ -57,7 +52,7 @@ public final class Log {
         }
     }
     
-    public static final void log(String format, Object... vars) {
+    public static void log(String format, Object... vars) {
         if (logEnabled) {
             StringBuilder string = new StringBuilder();
             for (int i = 0; i < indentation && indentation >= 0; i++) {
@@ -78,19 +73,19 @@ public final class Log {
         }
     }
     
-    public static final void logIndent(String format, Object... vars) {
+    public static  void logIndent(String format, Object... vars) {
         indent();
         log(format, vars);
         unindent();
     }
     
-    public static final void logUnindent(String format, Object... vars) {
+    public static  void logUnindent(String format, Object... vars) {
         unindent();
         log(format, vars);
         indent();
     }
     
-    public static final void newLine() {
+    public static void newLine() {
         log("");
     }
     
