@@ -1,12 +1,12 @@
 package com.github.kevinm.lb3tomml;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
 import com.github.kevinm.lb3tomml.lb3.Lb3Disassembler;
 import com.github.kevinm.lb3tomml.spc.Spc;
 import com.github.kevinm.lb3tomml.spc.SpcException;
 import com.github.kevinm.lb3tomml.util.Log;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 public final class Main {
 
@@ -71,14 +71,12 @@ public final class Main {
         Log.openLogFile(logName);
         
         String output = disassembler.disassemble();
-        boolean success;
 
         try (FileWriter fileWriter = new FileWriter(outputName)) {
             fileWriter.write(output);
             System.out.printf("%s exported without errors.%n", outputName);
         } catch (IOException e) {
             e.printStackTrace();
-            success = false;
         }
 
         Log.closeLogFile();

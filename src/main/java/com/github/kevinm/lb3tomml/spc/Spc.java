@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class Spc {
     
@@ -208,6 +209,7 @@ public class Spc {
         static String readString(RandomAccessFile file, int maxLength) throws IOException {
             byte[] res = new byte[maxLength];
             boolean hasEnded = false;
+            int len = 0;
             for(int i = 0; i < maxLength; i++) {
                 byte b = file.readByte();
                 if(!hasEnded) {
@@ -215,10 +217,11 @@ public class Spc {
                         hasEnded = true;
                     } else {
                         res[i] = b;
+                        len++;
                     }
                 }
             }
-            return new String(res);
+            return new String(Arrays.copyOf(res, len));
         }
         
         /**

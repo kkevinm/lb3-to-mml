@@ -80,7 +80,7 @@ public class Lb3Disassembler {
         output.append(spc.id666Tags.artistName);
         output.append("\"\n    #comment \"\"\n}\n\n#path \"");
         output.append(getPath());
-        output.append("\"\n\n#samples\n{");
+        output.append("\"\n\n#samples\n{\n    #default");
         for (String sample: samples) {
             output.append("\n    ");
             output.append(sample);
