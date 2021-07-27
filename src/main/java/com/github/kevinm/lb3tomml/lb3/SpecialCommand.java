@@ -121,7 +121,7 @@ public class SpecialCommand extends HexCommand {
                 break;
             case 0xf9:
                 par1 = channel.getNextByte();
-                newCommand = MmlCommand.hex(MmlSymbol.DETUNE, par1);
+                newCommand = MmlCommand.hex(MmlSymbol.DETUNE, 2*par1);
                 break;
             case 0xfc:
                 newCommand = buildLegatoCommand(channel, true);
