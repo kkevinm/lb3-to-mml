@@ -1,5 +1,6 @@
 package com.github.kevinm.lb3tomml.util;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -29,11 +30,11 @@ public final class Log {
         indentation--;
     }
     
-    public static void openLogFile(String fileName) {
+    public static void openLogFile(File file) {
         if (logEnabled) {
             closeLogFile();
             try {
-                logFile = new FileWriter(fileName);
+                logFile = new FileWriter(file);
             } catch (IOException e) {
                 logFile = null;
                 e.printStackTrace();

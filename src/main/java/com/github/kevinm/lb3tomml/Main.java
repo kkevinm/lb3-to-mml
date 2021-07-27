@@ -1,12 +1,15 @@
 package com.github.kevinm.lb3tomml;
 
 import com.github.kevinm.lb3tomml.lb3.Lb3Disassembler;
+import com.github.kevinm.lb3tomml.spc.BrrSample;
 import com.github.kevinm.lb3tomml.spc.Spc;
 import com.github.kevinm.lb3tomml.spc.SpcException;
 import com.github.kevinm.lb3tomml.util.Log;
+import com.github.kevinm.lb3tomml.util.Util;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public final class Main {
 
@@ -52,52 +55,72 @@ public final class Main {
         }
     }
     
-    private static void disassemble(String file) {
+    private static void disassemble(String fileName) {
         Spc spc;
         Lb3Disassembler disassembler;
         
         try {
-            spc = Spc.loadSpc(file);
+            spc = Spc.loadSpc(fileName);
             disassembler = new Lb3Disassembler(spc);
         } catch (IOException | SpcException e) {
             System.out.println("Error: " + e.getLocalizedMessage());
             return;
         }
-        
-        String baseName = removeExtension(file);
-        String outputName = baseName + ".txt";
-        String logName = baseName + ".log";
 
-        Log.openLogFile(logName);
+        String baseName = removeExtension(fileName);
+        File mmlFile = new File(baseName + ".txt");
+        File logFile = new File(baseName + ".log");
+
+        Log.openLogFile(logFile);
         
         String output = disassembler.disassemble();
 
-        try (FileWriter fileWriter = new FileWriter(outputName)) {
+        try (FileWriter fileWriter = new FileWriter(mmlFile)) {
             fileWriter.write(output);
-            System.out.printf("%s exported without errors.%n", outputName);
+            System.out.printf("%s exported without errors.%n", mmlFile.getName());
         } catch (IOException e) {
-            e.printStackTrace();
+            error(e);
+        }
+
+        String sampleDir = getPath(fileName) + disassembler.getSamplesPath() + Util.SEPARATOR;
+
+        new File(sampleDir).mkdir();
+        for (BrrSample sample: disassembler.getSamples()) {
+            String sampleFile = sampleDir + sample.getFullName();
+
+            try {
+                Files.write(Paths.get(sampleFile), sample.getData());
+                System.out.printf("%s exported without errors.%n", sample.getFullName());
+            } catch (IOException e) {
+                error(e);
+            }
         }
 
         Log.closeLogFile();
     }
-    
-    private static String removeExtension(String filename) {
-        if (filename == null) {
-            return null;
-        }
 
-        int extensionIndex = filename.lastIndexOf('.');
+    private static void error(Exception e) {
+        e.printStackTrace();
+        Log.closeLogFile();
+        System.exit(-1);
+    }
+
+    private static String getPath(String fileName) {
+        String fullPath = new File(fileName).getAbsolutePath();
+        return fullPath.substring(0, fullPath.lastIndexOf(Util.SEPARATOR)+1);
+    }
+
+    private static String removeExtension(String fileName) {
+        int extensionIndex = fileName.lastIndexOf('.');
         if (extensionIndex == -1) {
-            return filename;
+            return fileName;
         }
 
-        String separator = System.getProperty("file.separator");
-        int lastSeparatorIndex = filename.lastIndexOf(separator);
+        int lastSeparatorIndex = fileName.lastIndexOf(Util.SEPARATOR);
         if (extensionIndex > lastSeparatorIndex) {
-            return filename.substring(0, extensionIndex);
+            return fileName.substring(0, extensionIndex);
         } else {
-            return filename;
+            return fileName;
         }
     }
 

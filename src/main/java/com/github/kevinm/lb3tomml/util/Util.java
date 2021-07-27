@@ -2,6 +2,8 @@ package com.github.kevinm.lb3tomml.util;
 
 public final class Util {
 
+    public static final String SEPARATOR = System.getProperty("file.separator");
+
     private Util() {}
     
     public static String hexString(int value) {

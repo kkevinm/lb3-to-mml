@@ -3,15 +3,12 @@ package com.github.kevinm.lb3tomml.lb3;
 import com.github.kevinm.lb3tomml.mml.MmlMacro;
 import com.github.kevinm.lb3tomml.mml.MmlSymbol;
 import com.github.kevinm.lb3tomml.spc.Aram;
+import com.github.kevinm.lb3tomml.spc.BrrSample;
 import com.github.kevinm.lb3tomml.spc.Spc;
 import com.github.kevinm.lb3tomml.spc.SpcException;
 import com.github.kevinm.lb3tomml.util.Log;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Lb3Disassembler {
 
@@ -33,6 +30,7 @@ public class Lb3Disassembler {
     private final Aram aram;
     private final SongChannel[] channels = new SongChannel[CHANNEL_NUM];
     private final Set<Integer> instruments = new TreeSet<>();
+    private final List<BrrSample> samples = new ArrayList<>();
 
     public Lb3Disassembler(Spc spc) throws SpcException {
         this.spc = spc;
@@ -42,6 +40,18 @@ public class Lb3Disassembler {
         if (!Arrays.equals(aram.getUnsignedBytes(IDENTIFIER_ADDRESS, IDENTIFIER_LENGTH), IDENTIFIER_DATA)) {
             throw new SpcException("The SPC file is not from Last Bible III!");
         }
+    }
+
+    public List<BrrSample> getSamples() {
+        return samples;
+    }
+
+    public String getSamplesPath() {
+        return "lb3-" + spc.id666Tags.songTitle
+                .trim()
+                .replaceAll("\\d", "")
+                .replaceAll("\\s", "-")
+                .toLowerCase();
     }
 
     public String disassemble() {
@@ -64,14 +74,30 @@ public class Lb3Disassembler {
             Log.newLine();
         }
 
+        extractSamples();
+
         return convert();
+    }
+
+    private void extractSamples() {
+        for (int instrument: instruments) {
+            int startAddress = aram.getUnsignedWord(SAMPLE_POINTERS_ADDRESS + instrument*4);
+            int loopAddress = aram.getUnsignedWord(SAMPLE_POINTERS_ADDRESS + instrument*4 + 2);
+            BrrSample sample = BrrSample.extract(instrument, aram, startAddress, loopAddress);
+            samples.add(sample);
+
+            Log.log("Exported sample 0x%02x", instrument);
+            Log.indent();
+            Log.log("Size: 0x%04x", sample.getSize());
+            Log.log("Start address: 0x%04x", startAddress);
+            Log.log("Loop address: 0x%04x", loopAddress);
+            Log.log("AMK header: 0x%04x", sample.getAmkHeader());
+            Log.unindent();
+        }
     }
 
     private String convert() {
         StringBuilder output = new StringBuilder();
-        List<String> samples = instruments.stream()
-                .map(x -> "\"" + String.format("%02x", x) + ".brr\"")
-                .collect(Collectors.toList());
         output.append("#amk 2\n\n#spc\n{\n    #title   \"");
         output.append(spc.id666Tags.songTitle);
         output.append("\"\n    #game    \"");
@@ -79,18 +105,15 @@ public class Lb3Disassembler {
         output.append("\"\n    #author  \"");
         output.append(spc.id666Tags.artistName);
         output.append("\"\n    #comment \"\"\n}\n\n#path \"");
-        output.append(getPath());
+        output.append(getSamplesPath());
         output.append("\"\n\n#samples\n{\n    #default");
-        for (String sample: samples) {
-            output.append("\n    ");
-            output.append(sample);
+        for (BrrSample sample: samples) {
+            output.append(String.format("%n    \"%s\"", sample.getFullName()));
         }
         output.append("\n}\n\n#instruments\n{");
         int instr = 30;
-        for (String sample: samples) {
-            output.append("\n    ");
-            output.append(sample);
-            output.append(" $00 $00 $9f $00 $00 ; ");
+        for (BrrSample sample: samples) {
+            output.append(String.format("%n    \"%s\" $00 $00 $9f $00 $00 ; ", sample.getFullName()));
             output.append(MmlSymbol.INSTRUMENT);
             output.append(instr++);
         }
@@ -121,14 +144,6 @@ public class Lb3Disassembler {
         }
 
         return output.toString();
-    }
-
-    private String getPath() {
-        return "lb3-" + spc.id666Tags.songTitle
-                .trim()
-                .replaceAll("\\d", "")
-                .replaceAll("\\s", "-")
-                .toLowerCase();
     }
 
 }
