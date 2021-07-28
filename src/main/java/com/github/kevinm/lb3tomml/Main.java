@@ -7,14 +7,17 @@ import com.github.kevinm.lb3tomml.spc.SpcException;
 import com.github.kevinm.lb3tomml.util.Log;
 import com.github.kevinm.lb3tomml.util.Util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public final class Main {
 
     private static final String[][] OPTIONS = {
-            {"--log", "", "Logs the parser output into a .log file."}
+            {"--log", "", "Logs the parser output into a .log file."},
+            {"--address", "<addr>", "Sets the song data starting address manually."}
     };
 
     private Main() {}
@@ -31,27 +34,32 @@ public final class Main {
             System.exit(-1);
         }
 
-        int i;
-        for (i = 0; i < args.length; i++) {
-            if (!args[i].startsWith("--")) {
-                break;
-            }
-            processOption(args[i]);
-        }
-        
-        for (; i < args.length; i++) {
-            disassemble(args[i]);
-        }
+        run(args);
     }
 
-    private static void processOption(String arg) {
-        switch (arg) {
-            case "--log":
-                Log.enableLog();
+    private static void run(String[] args) {
+        int i;
+        for (i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (!arg.startsWith("--")) {
                 break;
-            default:
-                System.out.printf("Error: option %s was not recognised!%n", arg);
-                System.exit(-1);
+            }
+            switch (arg) {
+                case "--log":
+                    Log.enableLog();
+                    break;
+                case "--address":
+                    i++;
+                    Lb3Disassembler.SONG_DATA_ADDRESS_OVERRIDE = Integer.parseUnsignedInt(args[i], 16);
+                    break;
+                default:
+                    System.out.printf("Error: option %s was not recognised!%n", arg);
+                    System.exit(-1);
+            }
+        }
+
+        for (; i < args.length; i++) {
+            disassemble(args[i]);
         }
     }
     

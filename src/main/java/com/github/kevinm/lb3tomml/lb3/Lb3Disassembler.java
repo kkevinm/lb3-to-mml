@@ -26,6 +26,8 @@ public class Lb3Disassembler {
 
     private static final int CHANNEL_NUM = 8;
 
+    public static int SONG_DATA_ADDRESS_OVERRIDE = 0;
+
     private final Spc spc;
     private final Aram aram;
     private final SongChannel[] channels = new SongChannel[CHANNEL_NUM];
@@ -57,10 +59,12 @@ public class Lb3Disassembler {
     public String disassemble() {
         instruments.clear();
 
+        int songAddress = (SONG_DATA_ADDRESS_OVERRIDE == 0) ? SONG_DATA_ADDRESS : SONG_DATA_ADDRESS_OVERRIDE;
+
         // Create and process all the channels.
         for (int i = 0; i < CHANNEL_NUM; i++) {
-            int channelId = aram.getUnsignedByte(SONG_DATA_ADDRESS + 3*i);
-            int channelAddress = aram.getUnsignedWord(SONG_DATA_ADDRESS + 3*i + 1);
+            int channelId = aram.getUnsignedByte(songAddress + 3*i);
+            int channelAddress = aram.getUnsignedWord(songAddress + 3*i + 1);
             
             Log.log("Processing channel %d at address 0x%04x", channelId, channelAddress);
             Log.indent();
