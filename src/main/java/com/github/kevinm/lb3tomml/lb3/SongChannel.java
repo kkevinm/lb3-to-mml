@@ -168,6 +168,12 @@ public class SongChannel {
         return next;
     }
 
+    public void end() {
+        this.end = true;
+
+        Log.logIndent("Reached end of channel %d", id);
+    }
+
     public MmlCommand buildInstrumentCommand(int value) {
         instruments.add(value);
         return new MmlCommand(MmlMacro.INSTRUMENT, String.format("%02x", value));

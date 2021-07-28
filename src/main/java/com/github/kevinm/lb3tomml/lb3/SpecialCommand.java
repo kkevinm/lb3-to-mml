@@ -129,6 +129,9 @@ public class SpecialCommand extends HexCommand {
             case 0xfd:
                 newCommand = buildLegatoCommand(channel, false);
                 break;
+            case 0xff:
+                channel.end();
+                break;
 
             // Unknown commands with 1 parameter
             case 0xeb:
@@ -150,7 +153,6 @@ public class SpecialCommand extends HexCommand {
                 break;
 
             // "NOP" commands
-            case 0xff:
             default:
                 break;
         }

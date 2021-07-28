@@ -233,6 +233,9 @@ public class Spc {
          * @throws IllegalArgumentException If the character encoded is not a digit.
          */
         static int getDigit(byte b) {
+            if (b == 0) {
+                return 0;
+            }
             char c = (char) (b & 0xFF);
             if(!Character.isDigit(c))
                 throw new IllegalArgumentException("Expected a numeric value");
