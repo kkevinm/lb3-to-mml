@@ -49,7 +49,7 @@ public class Lb3Disassembler {
     public String getSamplesPath() {
         return "lb3-" + spc.id666Tags.songTitle
                 .trim()
-                .replaceAll("\\d", "")
+                .replaceAll("^\\d+", "")
                 .replaceAll("\\s", "-")
                 .toLowerCase();
     }

@@ -55,9 +55,11 @@ public class Spc {
         if(!file.getName().endsWith(".spc")) {
             throw new SpcException("The file is not an SPC!");
         }
+
         try(RandomAccessFile reader = new RandomAccessFile(file, "r")) {
             byte[] header = new byte[HEADER_LEN];
             reader.read(header);
+
             if(!SPC_HEADER.equals(new String(header))) {
                 throw new SpcException("Invalid header string!");
             }
@@ -66,16 +68,16 @@ public class Spc {
                 throw new SpcException("Invalid padding bytes!");
             }
             
-            boolean hasId666Tag;
+            boolean hasId666Tags;
             switch(reader.readByte()) {
             case 0x1A:
-                hasId666Tag = true;
+                hasId666Tags = true;
                 break;
             case 0x1B:
-                hasId666Tag = false;
+                hasId666Tags = false;
                 break;
             default:
-                throw new SpcException("Unable to determine if the file contains ID666 tag!");
+                throw new SpcException("Unable to determine if the file contains ID666 tags!");
             }
             
             byte version = reader.readByte();
@@ -88,9 +90,9 @@ public class Spc {
             
             Id666Tags id666Tags = null;
             
-            if(hasId666Tag) {
+            if(hasId666Tags) {
                 reader.seek(0x2E);
-                id666Tags = Id666Tags.getId666Tag(reader);
+                id666Tags = Id666Tags.getId666Tags(reader);
             }
             
             byte[] ram = new byte[RAM_LEN];
@@ -109,6 +111,7 @@ public class Spc {
     }
     
     public static class Id666Tags {
+
         public final String songTitle;
         public final String gameTitle;
         public final String dumperName;
@@ -148,7 +151,7 @@ public class Spc {
          * @return an {@link Id666Tags}
          * @throws IOException 
          */
-        static Id666Tags getId666Tag(RandomAccessFile file) throws IOException {
+        static Id666Tags getId666Tags(RandomAccessFile file) throws IOException {
             String songTitle = readString(file, 32);
             String gameTitle = readString(file, 32);
             String dumperName = readString(file, 16);
@@ -237,8 +240,9 @@ public class Spc {
                 return 0;
             }
             char c = (char) (b & 0xFF);
-            if(!Character.isDigit(c))
+            if(!Character.isDigit(c)) {
                 throw new IllegalArgumentException("Expected a numeric value");
+            }
             return c;
         }
         
@@ -255,8 +259,9 @@ public class Spc {
             int res = 0;
             for(int i = 0; i < maxLength; i++) {
                 byte b = file.readByte();
-                if(b == 0)
+                if(b == 0) {
                     break;
+                }
                 res *= 10;
                 res += getDigit(b);
             }

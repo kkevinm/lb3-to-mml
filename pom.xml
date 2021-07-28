@@ -14,7 +14,7 @@
     </properties>
     <description>A program to convert Last Bible III SPC files to AddmusicK MML files.</description>
     <dependencies>
-        
+
     </dependencies>
     <build>
         <plugins>
