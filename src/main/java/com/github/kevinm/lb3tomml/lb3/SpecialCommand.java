@@ -207,7 +207,7 @@ public class SpecialCommand extends HexCommand {
 
         private static final int[] DELAY = {21, 21, 26, 31, 11, 16, 1};
         private static final int[] FREQUENCY = {18, 14, 36, 7, 17, 36, 23};
-        private static final int[] AMPLITUDE = {0x60, 0x48, 0xf1, 0x18, 0x78, 0x78, 0xf5};
+        private static final int[] AMPLITUDE = {0x30, 0x24, 0xf1, 0x0c, 0x3c, 0x3c, 0xf5};
 
         public static MmlCommand getVibratoCommand(int value) {
             return MmlCommand.hex(MmlSymbol.VIBRATO, DELAY[value], FREQUENCY[value], AMPLITUDE[value]);
