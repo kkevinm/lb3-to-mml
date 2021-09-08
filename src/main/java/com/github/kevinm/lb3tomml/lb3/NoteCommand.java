@@ -45,7 +45,7 @@ public class NoteCommand extends HexCommand {
     }
     
     public boolean isTie() {
-        return value == 0x3b;
+        return value == 0x3b || value == 0x3d;
     }
     
     public boolean isNoise() {
